@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PHP_FPM_USER="www"
-PHP_FPM_GROUP="www"
+PHP_FPM_USER="www-data"
+PHP_FPM_GROUP="www-data"
 PHP_FPM_LISTEN_MODE="0660"
 PHP_MEMORY_LIMIT="512M"
 PHP_MAX_UPLOAD="50M"
@@ -12,21 +12,29 @@ PHP_DISPLAY_STARTUP_ERRORS="On"
 PHP_ERROR_REPORTING="E_COMPILE_ERROR|E_RECOVERABLE_ERROR|E_ERROR|E_CORE_ERROR"
 PHP_CGI_FIX_PATHINFO=0
 
-sed -i "s|;listen.owner\s*=\s*nobody|listen.owner = ${PHP_FPM_USER}|g" /etc/php/php-fpm.d/www.conf
-sed -i "s|;listen.group\s*=\s*nobody|listen.group = ${PHP_FPM_GROUP}|g" /etc/php/php-fpm.d/www.conf
-sed -i "s|;listen.mode\s*=\s*0660|listen.mode = ${PHP_FPM_LISTEN_MODE}|g" /etc/php/php-fpm.d/www.conf
-sed -i "s|user\s*=\s*nobody|user = ${PHP_FPM_USER}|g" /etc/php/php-fpm.d/www.conf
-sed -i "s|group\s*=\s*nobody|group = ${PHP_FPM_GROUP}|g" /etc/php/php-fpm.d/www.conf
-sed -i "s|;log_level\s*=\s*notice|log_level = notice|g" /etc/php/php-fpm.d/www.conf
-sed -i "s|display_errors\s*=\s*Off|display_errors = ${PHP_DISPLAY_ERRORS}|i" /etc/php/php.ini
-sed -i "s|display_startup_errors\s*=\s*Off|display_startup_errors = ${PHP_DISPLAY_STARTUP_ERRORS}|i" /etc/php/php.ini
-sed -i "s|error_reporting\s*=\s*E_ALL & ~E_DEPRECATED & ~E_STRICT|error_reporting = ${PHP_ERROR_REPORTING}|i" /etc/php/php.ini
-sed -i "s|;*memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|i" /etc/php/php.ini
-sed -i "s|;*upload_max_filesize =.*|upload_max_filesize = ${PHP_MAX_UPLOAD}|i" /etc/php/php.ini
-sed -i "s|;*max_file_uploads =.*|max_file_uploads = ${PHP_MAX_FILE_UPLOAD}|i" /etc/php/php.ini
-sed -i "s|;*post_max_size =.*|post_max_size = ${PHP_MAX_POST}|i" /etc/php/php.ini
-sed -i "s|;*cgi.fix_pathinfo=.*|cgi.fix_pathinfo= ${PHP_CGI_FIX_PATHINFO}|i" /etc/php/php.ini
-sed -i "s|;extension=fileinfo|extension=fileinfo|" /etc/php/php.ini
-sed -i "s|;extension=gd2|extension=gd2|" /etc/php/php.ini
-sed -i "s|;extension=pdo_sqlite|extension=pdo_sqlite|" /etc/php/php.ini
-sed -i "s|;extension=sqlite3|extension=sqlite3|" /etc/php/php.ini
+FPM_CONF="/usr/local/etc/php-fpm.d/www.conf"
+PHP_INI="/usr/local/etc/php/php.ini"
+
+# Configure php-fpm
+sed -i "s|;listen.owner\s*=.*|listen.owner = ${PHP_FPM_USER}|g" $FPM_CONF
+sed -i "s|;listen.group\s*=.*|listen.group = ${PHP_FPM_GROUP}|g" $FPM_CONF
+sed -i "s|;listen.mode\s*=.*|listen.mode = ${PHP_FPM_LISTEN_MODE}|g" $FPM_CONF
+sed -i "s|user\s*=.*|user = ${PHP_FPM_USER}|g" $FPM_CONF
+sed -i "s|group\s*=.*|group = ${PHP_FPM_GROUP}|g" $FPM_CONF
+sed -i "s|;log_level\s*=.*|log_level = notice|g" $FPM_CONF
+
+# Configure php.ini
+sed -i "s|display_errors\s*=.*|display_errors = ${PHP_DISPLAY_ERRORS}|i" $PHP_INI
+sed -i "s|display_startup_errors\s*=.*|display_startup_errors = ${PHP_DISPLAY_STARTUP_ERRORS}|i" $PHP_INI
+sed -i "s|error_reporting\s*=.*|error_reporting = ${PHP_ERROR_REPORTING}|i" $PHP_INI
+sed -i "s|;*memory_limit\s*=.*|memory_limit = ${PHP_MEMORY_LIMIT}|i" $PHP_INI
+sed -i "s|;*upload_max_filesize\s*=.*|upload_max_filesize = ${PHP_MAX_UPLOAD}|i" $PHP_INI
+sed -i "s|;*max_file_uploads\s*=.*|max_file_uploads = ${PHP_MAX_FILE_UPLOAD}|i" $PHP_INI
+sed -i "s|;*post_max_size\s*=.*|post_max_size = ${PHP_MAX_POST}|i" $PHP_INI
+sed -i "s|;*cgi.fix_pathinfo\s*=.*|cgi.fix_pathinfo = ${PHP_CGI_FIX_PATHINFO}|i" $PHP_INI
+
+# Enable useful extensions manually if not already loaded
+echo "extension=fileinfo" >> $PHP_INI
+echo "extension=gd" >> $PHP_INI
+echo "extension=pdo_sqlite" >> $PHP_INI
+echo "extension=sqlite3" >> $PHP_INI
