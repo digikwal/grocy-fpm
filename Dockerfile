@@ -2,11 +2,12 @@ FROM php:8.2-fpm-alpine
 
 ENV GROCY_VERSION=4.5.0
 
-# Install system dependencies and build tools
-RUN apk add --no-cache \
-    bash \
-    git \
-    unzip \
+# Install runtime dependencies + build tools (as virtual build-deps)
+RUN apk add --no-cache --virtual .build-deps \
+    g++ \
+    make \
+    autoconf \
+    pkgconf \
     icu-dev \
     libzip-dev \
     zlib-dev \
@@ -16,10 +17,9 @@ RUN apk add --no-cache \
     freetype-dev \
     sqlite-dev \
     libxml2-dev \
-    g++ \
-    make \
-    autoconf \
-    pkgconf
+ && apk add --no-cache \
+    unzip \
+    wget
 
 # Fix expected include paths for GD build
 RUN ln -s /usr/include/freetype2 /usr/include/freetype \
@@ -35,7 +35,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     opcache \
     zip \
     exif \
-    intl
+    intl \
+ && apk del .build-deps
 
 # Add Composer from official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -47,7 +48,7 @@ RUN chmod +x /usr/local/bin/configure_php.sh && /usr/local/bin/configure_php.sh
 # Set working directory
 WORKDIR /var/www/html
 
-# Download specific Grocy version
+# Download and extract Grocy
 RUN wget https://github.com/grocy/grocy/releases/download/v${GROCY_VERSION}/grocy_${GROCY_VERSION}.zip \
  && unzip grocy_${GROCY_VERSION}.zip -d . \
  && rm grocy_${GROCY_VERSION}.zip
@@ -56,7 +57,7 @@ RUN wget https://github.com/grocy/grocy/releases/download/v${GROCY_VERSION}/groc
 RUN cp config-dist.php data/config.php \
  && chown -R www-data:www-data data/config.php
 
-# Fix permissions
+# Fix ownership
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 9000
