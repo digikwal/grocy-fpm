@@ -5,7 +5,6 @@ ENV GROCY_VERSION=4.5.0
 # Install system dependencies and build tools
 RUN apk add --no-cache \
     bash \
-    curl \
     git \
     unzip \
     icu-dev \
@@ -49,9 +48,9 @@ RUN chmod +x /usr/local/bin/configure_php.sh && /usr/local/bin/configure_php.sh
 WORKDIR /var/www/html
 
 # Download specific Grocy version
-RUN curl -L -o grocy.zip https://github.com/grocy/grocy/releases/download/v${GROCY_VERSION}/grocy_${GROCY_VERSION}.zip \
- && unzip grocy.zip -d . \
- && rm grocy.zip
+RUN wget https://github.com/grocy/grocy/releases/download/v${GROCY_VERSION}/grocy_${GROCY_VERSION}.zip \
+ && unzip grocy_${GROCY_VERSION}.zip -d . \
+ && rm grocy_${GROCY_VERSION}.zip
 
 # Configure Grocy
 RUN cp config-dist.php data/config.php \
