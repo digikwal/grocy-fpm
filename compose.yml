@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  grocy:
+    image: grocy_docker
+    ports:
+      - "8080:9000"
+    volumes:
+      - grocy_data:/var/www/html/data
+    restart: unless-stopped
+
+volumes:
+  grocy_data:
