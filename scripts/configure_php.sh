@@ -34,7 +34,9 @@ sed -i "s|;*post_max_size\s*=.*|post_max_size = ${PHP_MAX_POST}|i" $PHP_INI
 sed -i "s|;*cgi.fix_pathinfo\s*=.*|cgi.fix_pathinfo = ${PHP_CGI_FIX_PATHINFO}|i" $PHP_INI
 
 # Enable useful extensions manually if not already loaded
-echo "extension=fileinfo" >> $PHP_INI
-echo "extension=gd" >> $PHP_INI
-echo "extension=pdo_sqlite" >> $PHP_INI
-echo "extension=sqlite3" >> $PHP_INI
+{
+	echo "extension=fileinfo"
+	echo "extension=gd"
+	echo "extension=pdo_sqlite"
+	echo "extension=sqlite3"
+} >>"$PHP_INI"
