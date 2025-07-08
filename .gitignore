@@ -19,3 +19,6 @@ Thumbs.db
 # IDE-specific files
 .vscode/
 .idea/
+
+# Node cache files
+node_modules/
