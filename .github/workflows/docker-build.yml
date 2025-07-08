@@ -1,0 +1,48 @@
+# .github/workflows/docker-build.yml
+name: Grocy FPM
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Setup environment variables
+        run: |
+          echo "TAG_NAME=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag digikwal/grocy-fpm:${{ env.TAG_NAME }} \
+            --file Dockerfile .
+
+      - name: Push Docker image and tags
+        env:
+          DOCKER_IMAGE: digikwal/grocy-fpm
+        run: |
+          echo "Using immutable tag: $TAG_NAME"
+
+          docker push ${DOCKER_IMAGE}:${TAG_NAME}
+
+          if [[ "$TAG_NAME" == *"-"* ]]; then
+            echo "Detected prerelease. Tagging as dev..."
+            docker tag ${DOCKER_IMAGE}:${TAG_NAME} ${DOCKER_IMAGE}:dev
+            docker push ${DOCKER_IMAGE}:dev
+          else
+            echo "Detected stable release. Tagging as latest..."
+            docker tag ${DOCKER_IMAGE}:${TAG_NAME} ${DOCKER_IMAGE}:latest
+            docker push ${DOCKER_IMAGE}:latest
+          fi
