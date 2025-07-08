@@ -9,13 +9,13 @@ repos:
         types: [file]
       - id: hadolint
         name: Hadolint Dockerfile Linter
-        entry: docker run --rm -v ${PWD}:/mnt hadolint/hadolint hadolint
+        entry: sh -c 'docker run --rm -v "$(pwd)":/mnt hadolint/hadolint hadolint /mnt/Dockerfile'
         language: system
         types: [dockerfile]
         files: ^Dockerfile$
       - id: docker-compose-lint
         name: Docker Compose Linter (dclint)
-        entry: docker run -t --rm -v ${PWD}:/app zavoloklom/dclint .
+        entry: sh -c 'docker run -t --rm -v "$(pwd)":/app zavoloklom/dclint .'
         language: system
         types: [yaml]
         files: ^docker-compose\.ya?ml$
