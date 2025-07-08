@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   grocy:
-    image: grocy_docker
+    image: digikwal/grocy-fpm:v1.0.0
     ports:
       - "8080:9000"
     volumes:
