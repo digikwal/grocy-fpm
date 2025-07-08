@@ -28,7 +28,7 @@ RUN ln -s /usr/include/freetype2 /usr/include/freetype \
 
 # Configure and install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j"$(nproc)" \  # SC2046: quote $(nproc)
+ && docker-php-ext-install -j"$(nproc)" \
     gd \
     pdo \
     pdo_mysql \
